@@ -1,7 +1,9 @@
 const express = require("express");
 const expressLayouts=require('express-ejs-layouts');
-
+const mongoose = require('mongoose');
 const app=express();
+
+const db=require('./config/mongoose');
 
 //EJS
 app.use(expressLayouts);
