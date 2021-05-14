@@ -1,6 +1,9 @@
 const express=require('express');
 const { pass } = require('../config/mongoose');
 const router =express.Router();
+const bcrypt=require('bcryptjs');
+
+const User=require('../models/User');
 
 router.get('/login',(req,res)=>res.render('login'));
 
@@ -32,7 +35,45 @@ router.post('/register',(req,res)=>{
         });
     }
     else {
-        res.send('pass');
+        //Validation passed
+        User.findOne({email : email}).
+        then(user=>{
+            if(user){
+                // user exists
+                errors.push({msg:'Email is already registered'}); 
+                res.render('register',{
+                    errors,
+                    name,
+                    email,
+                    password,
+                    password2
+                });
+            }
+            else {
+                const newUser = new User({
+                    name,
+                    email,
+                    password
+                });
+               // Hash password
+
+               bcrypt.genSalt(10,(err,salt)=>
+                bcrypt.hash(newUser.password,salt,(err,hash)=>{
+                    if(err) throw err;
+
+                    //Set password to hashed password
+                    newUser.password=hash;
+                    //Save user
+                    newUser.save()
+                        .then(user=>{
+                            req.flash('success_msg','You are now registered and log in');
+                            res.redirect('/users/login');
+                        })
+                        .catch(err=> console.log(err));
+
+               }))
+            }
+        })
     }
 })
 
