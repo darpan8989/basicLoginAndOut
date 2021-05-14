@@ -9,6 +9,9 @@ const db=require('./config/mongoose');
 app.use(expressLayouts);
 app.set('view engine','ejs');
 
+//Bodyparser
+app.use(express.urlencoded({extended:false}));//This helps in getting data to req.body from the forms
+
 //Routes
 app.use('/',require('./routes/index'));
 app.use('/users',require('./routes/users'));
